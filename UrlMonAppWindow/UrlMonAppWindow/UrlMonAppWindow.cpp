@@ -12,7 +12,7 @@ class UrlMonClient : public IBindStatusCallback
 public:
 	UrlMonClient() : m_cRef(0) 
 	{
-		m_bindf = BINDF_ASYNCHRONOUS;
+		m_bindf = BINDF_ASYNCHRONOUS | BINDF_PULLDATA | BINDF_ASYNCSTORAGE;
 	}
 	virtual ~UrlMonClient() {}
 
@@ -133,7 +133,7 @@ public:
 	}
 private:
 	ULONG m_cRef;
-	BINDF m_bindf;
+	DWORD m_bindf;
 	IMoniker* m_urlMoniker;
 	IBindCtx* m_bindCtx;
 };

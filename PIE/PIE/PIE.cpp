@@ -7,88 +7,217 @@
 struct Node
 {
 	int data;
-	Node* left;
-	Node* right;
+	Node* next;
 };
 
-Node* CreateNode(int data)
+void SelectionSort(int data[], int size)
 {
-	Node* n = new Node();
-	n->data = data;
-	n->left = 0;
-	n->right = 0;
-	return n;
-}
-
-void SetChildren(Node* n, Node* l, Node* r)
-{
-	n->left = l;
-	n->right = r;
-}
-
-int Height(Node* n, int i)
-{
-	if (!n)
-		return i;
-
-	int l = Height(n->left, i + 1);
-	int r = Height(n->right, i + 1);
-	if (l > r)
-		return l;
-	return r;
-}
-
-// Doing it recursive
-void PrintPreOrder(Node* n)
-{
-	DataStructures::Stack<Node*> s;
-	while (1)
+	for (int i = 0; i < size; i++)
 	{
-		if (n)
+		for (int j = i + 1; j < size; j++)
 		{
-			s.Push(n);
-			printf("%d\n", n->data);
-			n = n->left;
-		}
-		else
-		{
-			if (s.IsEmpty())
-				break;
-			n = s.Pop();
-			n = n->right;
+			if (data[j] < data[i])
+			{
+				int temp = data[i];
+				data[i] = data[j];
+				data[j] = temp;
+			}
 		}
 	}
 }
 
-int LCA(Node* n, int a, int b)
+void InsertionSort(int data[], int len)
 {
-	if (n->data >= a && n->data <= b)
-		return n->data;
-	if (b < n->data)
-		return LCA(n->left, a, b);
-	else
-		return LCA(n->right, a, b);
+	for (int i = 1; i < len; i++)
+	{
+		int temp = data[i];
+		int j = i - 1;
+		while(j >= 0)
+		{
+			if (data[j] > temp)
+				data[j + 1] = data[j];
+			else
+				break;
+
+			j--;
+		}
+		data[j + 1] = temp;
+	}
 }
+
+void QuickSort(int data[], int start, int end)
+{
+	if (start >= end)
+		return;
+
+	int p = (start + end) / 2;
+	int temp = data[p];
+	int i = start;
+	int j = start;
+	while (i <= end)
+	{
+		if (data[j] < temp)
+			j++;
+		if ((data[i] < temp) && (j < i))
+		{
+			if (j == p)
+			{
+				p = i;
+			}
+
+			int cache = data[i];
+			data[i] = data[j];
+			data[j] = cache;
+		}
+		i++;
+	}
+	int cache = data[j];
+	data[j] = data[p];
+	data[p] = cache;
+
+	QuickSort(data, start, j - 1);
+	QuickSort(data, j + 1, end);
+}
+
+void Merge(int data[], int start, int end)
+{
+	int size = (end - start) + 1;
+	int* temp = new int[size]();
+	int i = 0;
+
+	int mid = (start + end) / 2;
+	int head1 = start;
+	int head2 = mid + 1;
+	
+	while (head1 <= mid && head2 <= end)
+	{
+		if (data[head1] < data[head2])
+			temp[i++] = data[head1++];
+		else
+			temp[i++] = data[head2++];
+	}
+
+	while (head1 <= mid)
+	{
+		temp[i++] = data[head1++];
+	}
+	while (head2 <= end)
+	{
+		temp[i++] = data[head2++];
+	}
+
+	i = 0;
+	for (int j = start; j <= end; j++)
+	{
+		data[j] = temp[i++];
+	}
+}
+
+void MergeSort(int data[], int start, int end)
+{
+	if (start == end)
+		return;
+	int mid = (start + end) / 2;
+	MergeSort(data, start, mid);
+	MergeSort(data, mid + 1, end);
+	Merge(data, start, end);
+}
+
+Node* FindMidNode(Node* n)
+{
+	Node* fast = n;
+	Node* slow = n;
+	Node* prev = n;;
+	while (fast)
+	{
+		fast = fast->next;
+		if (!fast)
+			break;
+		fast = fast->next;
+
+		prev = slow;
+		slow = slow->next;
+	}
+
+	return prev;
+}
+
+Node* MergeLL(Node* l, Node* r)
+{
+	if (!r)
+		return l;
+	if (!l)
+		return r;
+
+	Node* head = nullptr;
+	Node* current = nullptr;
+	while (l && r)
+	{
+		if (l->data < r->data)
+		{
+			if (current)
+				current->next = l;
+			current = l;
+			l = l->next;
+		}
+		else
+		{
+			if (current)
+				current->next = r;
+			current = r;
+			r = r->next;
+		}
+		if (!head)
+			head = current;
+	}
+
+	if (l)
+		current->next = l;
+	if (r)
+		current->next = r;
+	
+	return head;
+}
+
+Node* MergeSortLL(Node* n)
+{
+	if (!n || !n->next)
+		return n;
+
+	Node* mid = FindMidNode(n);
+	Node* temp = mid->next;
+	mid->next = nullptr;
+
+	Node* l = MergeSortLL(n);
+	Node* r = MergeSortLL(temp);
+	return MergeLL(l, r);
+}
+
 
 int main()
 {
-	Node* n10 = CreateNode(10);
-	Node* n5 = CreateNode(5);
-	Node* n15 = CreateNode(15);
-	Node* n2 = CreateNode(2);
-	Node* n7 = CreateNode(7);
-	Node* n13 = CreateNode(13);
-	Node* n1 = CreateNode(1);
+	Node* n1 = new Node();
+	n1->data = 1;
+	n1->next = nullptr;
+	Node* n2 = new Node();
+	n2->data = 2;
+	n2->next = nullptr;
+	Node* n3 = new Node();
+	n3->data = 3;
+	n3->next = nullptr;
+	Node* n4 = new Node();
+	n4->data = 4;
+	n4->next = nullptr;
+	Node* n5 = new Node();
+	n5->data = 5;
+	n5->next = nullptr;
 
-	SetChildren(n10, n5, n15);
-	SetChildren(n5, n2, n7);
-	SetChildren(n15, n13, nullptr);
-	SetChildren(n2, n1, nullptr);
+	n2->next = n1;
+	n1->next = n3;
+	n3->next = n5;
+	n5->next = n4;
 
-	int lca = LCA(n10, 5, 13);
-	lca = LCA(n10, 13, 15);
-	lca = LCA(n10, 2, 7);
-	lca = LCA(n10, 1, 7);
+	Node* result = MergeSortLL(n2);
 
 	return 0;
 }
