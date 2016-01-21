@@ -171,11 +171,19 @@ namespace DataStructures
 			newHashItem->value = value;
 			newHashItem->next = nullptr;
 
-			int index = HashFunction(key) % size;
+			int index = HashFunction(key);
 			HashItem<K, V>* hashItem = hashItems[index];
 			if (hashItem)
 			{
-				_InsertInEnd(hashItem, newHashItem);
+				V* pValue = Find(key);
+				if (pValue)
+				{
+					*pValue = value;
+				}
+				else
+				{
+					_InsertInEnd(hashItem, newHashItem);
+				}
 			}
 			else
 			{
@@ -184,19 +192,23 @@ namespace DataStructures
 
 		}
 
-		bool Find(K key, V* pV)
+		// returns nullptr if not key not found
+		V* Find(K key)
 		{
-			int index = HashFunction(key) % size;
+			int index = HashFunction(key);
 			HashItem<K, V>* hashItem = hashItems[index];
 			if (hashItem)
 			{
-				*pV = hashItem->value;
-				return true;
+				while (hashItem)
+				{
+					if (hashItem->key == key)
+					{
+						return &(hashItem->value);
+					}
+				}
 			}
-			else
-			{
-				return false;
-			}
+
+			return nullptr;
 		}
 
 	private:
@@ -226,4 +238,74 @@ namespace DataStructures
 		int size;
 		HashItem<K,V>** hashItems;
 	};
+
+	template <class T>
+	void HeapifyDown(T data[], int len, int i)
+	{
+		int left = (2 * i) + 1;
+		int right = (2 * i) + 2;
+		if (left < len && right < len)
+		{
+			if (data[left] > data[right])
+			{
+				if (data[left] > data[i])
+				{
+					T temp = data[i];
+					data[i] = data[left];
+					data[left] = temp;
+					HeapifyDown(data, len, left);
+				}
+			}
+			else
+			{
+				if (data[right] > data[i])
+				{
+					T temp = data[i];
+					data[i] = data[right];
+					data[right] = temp;
+					HeapifyDown(data, len, right);
+				}
+			}
+		}
+		else if (left < len)
+		{
+			if (data[left] > data[i])
+			{
+				T temp = data[i];
+				data[i] = data[left];
+				data[left] = temp;
+				HeapifyDown(data, len, left);
+			}
+		}
+		else if (right < len)
+		{
+			if (data[right] > data[i])
+			{
+				T temp = data[i];
+				data[i] = data[right];
+				data[right] = temp;
+				HeapifyDown(data, len, right);
+			}
+		}
+	}
+
+	template <class T>
+	void HeapSort(T data[], int len)
+	{
+		int lastNonLeftNode = (len - 1);
+		int lastNonLeftNodeParent = (lastNonLeftNode - 1) / 2;
+		for (int i = lastNonLeftNodeParent; i >= 0; i--)
+		{
+			HeapifyDown(data, len, i);
+		}
+
+		for (int i = 1; i < len; i++)
+		{
+			T temp = data[0];
+			data[0] = data[len - i];
+			data[len - i] = temp;
+			HeapifyDown(data, len - i, 0);
+		}
+
+	}
 }
