@@ -155,7 +155,7 @@ namespace DataStructures
 	class Hash
 	{
 	public:
-		Hash() : size(100)
+		Hash() : size(100), numberOfItems(0)
 		{
 			hashItems = new HashItem<K, V>*[size]();
 		}
@@ -190,7 +190,13 @@ namespace DataStructures
 				hashItems[index] = newHashItem;
 			}
 
+            numberOfItems++;
 		}
+
+        void Remove(K key)
+        {
+            // not implemented but i know how to.
+        }
 
 		// returns nullptr if not key not found
 		V* Find(K key)
@@ -210,6 +216,11 @@ namespace DataStructures
 
 			return nullptr;
 		}
+
+        int NumberOfItems()
+        {
+            return numberOfItems;
+        }
 
 	private:
 		template <class K, class V>
@@ -236,6 +247,7 @@ namespace DataStructures
 		}
 
 		int size;
+        int numberOfItems;
 		HashItem<K,V>** hashItems;
 	};
 

@@ -4,6 +4,14 @@
 #include "stdafx.h"
 #include "DataStructures.h"
 
+int abs(int a, int b)
+{
+    int result = a - b;
+    if (result < 0)
+        return result*-1;
+    return result;
+}
+
 // given two strings is one permutation of another? e.g abc == acb
 bool Permutation(char str1[], char str2[])
 {
@@ -148,12 +156,111 @@ bool CanItBePalindromeV2(char str[])
 
 }
 
+bool OneOrZeroEditAway(char str1[], char str2[])
+{
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+
+    if (abs(len1, len2) > 1)
+        return false;
+
+
+    if (len1 == len2)
+    {
+        int count = 0;
+        for (int i = 0; i < len1; i++)
+        {
+            if (str1[i] != str2[i])
+                count++;
+        }
+        if (count > 1)
+            return false;
+    }
+    else
+    {
+        int shortLen = len1;
+        int longLen = len2;
+        char* shortStr = str1;
+        char* longStr = str2;
+        if (len2 < len1)
+        {
+            shortLen = len2;
+            longLen = len1;
+            shortStr = str2;
+            longStr = str1;
+        }
+
+        int shortCount = 0;
+        for (int i = 0; i < longLen; i++)
+        {
+            if ((shortCount < shortLen) && (longStr[i] == shortStr[shortCount]))
+            {
+                shortCount++;
+            }
+        }
+
+        if (shortCount == shortLen)
+            return true;
+        return false;
+    }
+}
+
+char* CompressString(char str[])
+{
+    if (!str)
+        return nullptr;
+
+    int len = strlen(str);
+    if (len == 0)
+        return nullptr;
+
+    int count = 0;
+
+    int i = 0;
+    for (; i < len - 1; i++)
+    {
+        if (str[i] != str[i + 1])
+            count++;
+    }
+
+    count++;
+    int newStrLen = (count * 2);
+    char* newStr = new char[newStrLen + 1]();
+
+    i = 0;
+    int repeat = 0;
+    int x = 0;
+    for (; i < len - 1; i++)
+    {
+        if (str[i] != str[i + 1])
+        {
+            newStr[x++] = str[i];
+            newStr[x++] = '0' + (repeat + 1);
+            repeat = 0;
+        }
+        else
+        {
+            repeat++;
+        }
+    }
+
+    newStr[x++] = str[i];
+    newStr[x++] = '0' + (repeat + 1);
+    return newStr;
+}
+
 
 int main()
 {
-	char str[] = "ab ab ab a ";
-	bool result = CanItBePalindromeV2(str);
 
+    bool result = OneOrZeroEditAway("bake", "baka"); //true
+    result = OneOrZeroEditAway("bake", "eake"); //true
+    result = OneOrZeroEditAway("bake", "beka"); // false
+    result = OneOrZeroEditAway("bake", "bbake"); // true
+    result = OneOrZeroEditAway("bake", "bbaka"); // false
+    result = OneOrZeroEditAway("bake", "bke"); // true
+    result = OneOrZeroEditAway("bake", "ake"); // true
+    result = OneOrZeroEditAway("bake", "aee"); // false
 	return 0;
 }
 
